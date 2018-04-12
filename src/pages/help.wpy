@@ -1,0 +1,217 @@
+<template>
+  <image class="help-pic" src="/images/help.jpg" />
+  <view class="help-text">
+    你的好友 <text>{{helpUser.nickName}}</text> 即将参加公务员考试
+  </view>
+  <image class="help-avatar" src="{{helpUser.avatarUrl}}" />
+  <image class="helpText-pic" src="/images/{{helpTextPic}}.png" />
+  <view class="progress">
+    <!-- <view class="start dot"></view>
+    <view class="end dot"></view> -->
+    <image class="move {{helping ? 'rotate': ''}}" style="left: {{offsetLeft}}rpx" src="/images/p.png" />
+  </view>
+  <view class="percentage">{{percentage}}%</view>
+  <view class="help-btn" @tap="bingHelp">
+    <image src="/images/helpBtn.png" />
+    {{helpText}}
+  </view>
+</template>
+<script>
+import wepy from 'wepy';
+
+export default class Help extends wepy.page {
+  config = {
+    navigationBarTitleText: '考神鴐衜',
+    navigationBarBackgroundColor: '#41e05f',
+    navigationBarTextStyle: 'white'
+  };
+  data = {
+    userInfo: {},
+    helping: false,
+    runeid: '', // 考神符id
+    percentage: 0,
+    helpText: '立即为他助力',
+    helpTextPic: 'helpText2',
+    inserval: null,
+    helpUser: '' //给谁助力
+  };
+  computed = {
+    offsetLeft() {
+      return -48 + 600 * (this.percentage / 100);
+    }
+  };
+  async onLoad(options) {
+    let app = this.$parent;
+    // let openid = options.openid;
+
+    this.runeid = options.runeid;
+    //获取url参数openid 获取助力的对象
+    let result = await wepy.request({
+      url: app.globalData.baseUrl + '/rune/' + this.runeid,
+      // method: 'POST'
+    });
+    this.helpUser = result.data.owner;
+    this.$apply();
+
+    app.userInfoReadyCallback = res => {
+      this.userInfo = res.userInfo;
+    };
+    if (app.globalData.userInfo) {
+      this.userInfo = app.globalData.userInfo;
+    } else {
+      let res = await wepy.getUserInfo();
+      this.userInfo = res.userInfo;
+      this.$apply();
+    }
+  }
+  methods = {
+    async bingHelp() {
+      if (this.helpText == '俺也要领取考神符') {
+        wx.redirectTo({
+          url: '/pages/index'
+        });
+        return;
+      }
+      // let openid = wepy.getStorageSync('openid');
+      // if (!openid) {
+      //   openid = await this.$parent.login().openid;
+      // }
+      // 助力
+      let res = await wepy.request({
+        url: this.$parent.globalData.baseUrl + '/help',
+        method: 'POST',
+        data: {
+          user: {
+            nickName: this.userInfo.nickName,
+            avatarUrl: this.userInfo.avatarUrl
+          },
+          runeid: this.runeid
+        }
+      });
+      this.helping = true;
+      this.helpText = '正在为他助力';
+      this.interval = setInterval(() => {
+        if (this.percentage >= 100) {
+          this.percentage = 100;
+          clearInterval(this.interval);
+          this.helping = false;
+          this.helpText = '俺也要领取考神符';
+          this.helpTextPic = 'helpText';
+          this.$apply();
+          return;
+        }
+        this.percentage = this.percentage + Math.ceil(Math.random() * 4);
+        this.$apply();
+      }, 16);
+    }
+  };
+}
+</script>
+<style lang="less">
+page {
+  background: #41e05f;
+}
+.help-pic {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 506rpx;
+  z-index: -1;
+}
+.help-text {
+  font-size: 32rpx;
+  color: #fff;
+  width: 486rpx;
+  text-align: center;
+  margin: 510rpx auto 0;
+  text {
+    font-size: 38rpx;
+    margin: 0 5rpx;
+  }
+}
+.helpText-pic {
+  width: 390rpx;
+  height: 85rpx;
+  margin: 0 auto;
+  display: block;
+  margin-top: 16rpx;
+}
+.help-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  border: 4rpx solid #fff;
+  display: block;
+  margin: 24rpx auto 0;
+}
+.progress {
+  width: 600rpx;
+  height: 6rpx;
+  background: #fff;
+  position: relative;
+  margin: 70rpx auto 0;
+  .dot {
+    width: 14rpx;
+    height: 14rpx;
+    border-radius: 50%;
+    position: absolute;
+    top: -10rpx;
+  }
+  .start {
+    background: #54fc87;
+    left: -11rpx;
+    border: 6rpx solid rgba(84, 252, 135, 0.3);
+  }
+  .end {
+    background: #e8317f;
+    right: -11rpx;
+    border: 6rpx solid rgba(232, 49, 127, 0.2);
+  }
+  .move {
+    width: 96rpx;
+    height: 96rpx;
+    position: absolute;
+    top: -45rpx;
+    left: -45rpx;
+  }
+  .move.rotate {
+    animation: rotate 0.5s linear infinite;
+  }
+}
+.percentage {
+  font-size: 52rpx;
+  color: #e82469;
+  font-weight: bold;
+  margin-top: 50rpx;
+  text-align: center;
+}
+.help-btn {
+  width: 690rpx;
+  height: 124rpx;
+  position: relative;
+  font-size: 50rpx;
+  color: #fff;
+  text-align: center;
+  line-height: 124rpx;
+  margin: 42rpx auto;
+  image {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+}
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>
+
+

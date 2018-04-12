@@ -1,0 +1,50 @@
+{
+	"description": "A WePY project",
+	"setting": {
+		"urlCheck": false,
+		"es6": false,
+		"postcss": false,
+		"minified": false,
+		"newFeature": true
+	},
+	"compileType": "miniprogram",
+	"appid": "wx42440125bfabc34f",
+	"projectname": "%E5%85%AC%E8%80%83%E5%8A%A9%E5%8A%9B",
+	"miniprogramRoot": "./dist",
+	"condition": {
+		"search": {
+			"current": -1,
+			"list": []
+		},
+		"conversation": {
+			"current": -1,
+			"list": []
+		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
+		"game": {
+			"list": []
+		},
+		"miniprogram": {
+			"current": -1,
+			"list": [
+				{
+					"id": -1,
+					"name": "扫描二维码",
+					"pathName": "pages/home",
+					"query": "scene=\"12345\"",
+					"scene": "1011"
+				},
+				{
+					"id": 1,
+					"name": "转发",
+					"pathName": "pages/help",
+					"query": "runeid=5acf072a9dca1619b813aa0b",
+					"scene": "1007"
+				}
+			]
+		}
+	}
+}

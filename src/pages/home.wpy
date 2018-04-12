@@ -1,0 +1,431 @@
+<style lang="less">
+@color: #c94ee4;
+.text-style {
+  font-size: 26rpx;
+  color: #a5a5a5;
+}
+.bg-pic {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+}
+.header {
+  min-height: 298rpx;
+  border: 4rpx solid #83ef98;
+  border-radius: 15px;
+  margin-top: 25rpx;
+  box-sizing: border-box;
+  padding: 24rpx;
+  background: #fff;
+  transition: all 0.5s;
+  position: absolute;
+  z-index: 12;
+  width: 690rpx;
+  top: 0;
+  .userInfo {
+    display: flex;
+    .avatar {
+      width: 110rpx;
+      height: 110rpx;
+      border-radius: 50%;
+      border: 2rpx solid @color;
+      margin-right: 24rpx;
+      .avatar-pic {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+      }
+    }
+    .info {
+      padding-top: 30rpx;
+    }
+    .nickName {
+      font-size: 30rpx;
+      color: @color;
+    }
+    .helpInfo {
+      .text-style;
+      margin-top: 6rpx;
+    }
+  }
+  .noHelp {
+    width: 401rpx;
+    height: 108rpx;
+    margin-left: 120rpx;
+  }
+  .helpMe-wrap {
+    display: flex;
+    align-items: center;
+    height: 70rpx;
+    margin-top: 28rpx;
+    .helpMe-text {
+      .text-style;
+      width: 190rpx;
+      flex-shrink: 0;
+    }
+    .helpMe-list {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .helpMe-people:last-child {
+      margin: 0;
+    }
+  }
+  .helpMe-all {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 28rpx;
+    .helpMe-people {
+      margin-bottom: 20rpx;
+      &:nth-child(7n) {
+        margin-right: 0;
+      }
+    }
+  }
+  .helpMe-people {
+    width: 70rpx;
+    height: 70rpx;
+    border-radius: 5px;
+    margin-right: 22rpx;
+  }
+  .moreBtn {
+    width: 79rpx;
+    height: 79rpx;
+    border-radius: 50%;
+    position: absolute;
+    left: 50%;
+    bottom: -40rpx;
+    transform: translateX(-40rpx);
+
+    color: #fff;
+    z-index: 10;
+    .bg {
+      .bg-pic;
+    }
+    .arraw {
+      text-align: center;
+      line-height: 79rpx;
+      transition: all 0.5s;
+    }
+    .down {
+      transform: rotate(90deg);
+    }
+    .up {
+      transform: rotate(-90deg);
+    }
+  }
+}
+.main {
+  margin-top: 380rpx;
+  width: 690rpx;
+  height: 650rpx;
+  position: relative;
+  box-shadow: 0px 6px 35px 0px rgba(65, 224, 95, 0.75);
+  border-radius: 12px;
+  .share-pic {
+    .bg-pic;
+  }
+  .share-des {
+    color: #fff;
+    font-size: 34rpx;
+    width: 560rpx;
+    padding-top: 410rpx;
+    margin: 0 auto;
+    text-align: center;
+  }
+}
+.footer {
+  padding-bottom: 38rpx;
+  margin-top: 30rpx;
+  display: flex;
+  justify-content: space-between;
+  .shareBtn {
+    width: 334rpx;
+    height: 106rpx;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 30rpx;
+    border: none;
+    .bg {
+      .bg-pic;
+    }
+    .iconfont {
+      margin-right: 10rpx;
+    }
+  }
+}
+// 遮罩层
+.mask {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  flex-direction: column;
+  .save-btn {
+    width: 354rpx;
+    height: 100rpx;
+    display: block;
+    margin-top: 45rpx;
+  }
+  .text {
+    font-size: 28rpx;
+    color: #fff;
+    margin-top: 20rpx;
+  }
+  .loading {
+    width: 266rpx;
+    height: 266rpx;
+    border-radius: 50%;
+    border: 2rpx solid #88abda;
+    text-align: center;
+    position: relative;
+    align-items: center;
+    color: rgb(62, 230, 121);
+    // background-color: rgb(118, 218, 255);
+    background-image: -webkit-linear-gradient(
+      180deg,
+      rgb(76, 231, 51) 0%,
+      rgb(62, 230, 121) 100%
+    );
+
+    overflow: hidden;
+    &:before,
+    &:after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      min-width: 250vw;
+      min-height: 250vw;
+      background-color: #fff;
+      animation-name: rotate;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+    }
+    &:before {
+      bottom: 15vh;
+      border-radius: 45%;
+      animation-duration: 10s;
+    }
+
+    &:after {
+      bottom: 12vh;
+      opacity: 0.5;
+      border-radius: 47%;
+      animation-duration: 10s;
+    }
+  }
+}
+.tempImg {
+  width: 690rpx;
+  height: 960rpx;
+  z-index: 100;
+}
+@keyframes rotate {
+  0% {
+    transform: translate(-50%, 0) rotateZ(0deg);
+  }
+  50% {
+    transform: translate(-50%, -2%) rotateZ(180deg);
+  }
+  100% {
+    transform: translate(-50%, 0%) rotateZ(360deg);
+  }
+}
+</style>
+<template>
+  <view class="container">    
+    <view class="header">
+      <view class="userInfo">
+        <view class="avatar">
+          <image class="avatar-pic" src="{{userInfo.avatarUrl}}" />
+        </view>
+        <view class="info">
+          <view class="nickName">Hello! {{userInfo.nickName}}</view>
+          <view class="helpInfo" wx:if="{{helpInfo.helps.length}}">获得助力: {{helpInfo.helps.length}} 次        <text style="padding: 0 10rpx"></text>好友排行: 10名</view>
+        </view>
+        
+      </view>
+      <image wx:if="{{!helpInfo.helps.length}}" class="noHelp" src="/images/noHelp.png" />
+      <view wx:if="{{helpInfo.helps.length}}" class="helpMe-wrap">
+        <view class="helpMe-text">为我助力好友:</view>
+         <view class="helpMe-list">
+           {{helpInfo.helps.slice(0, 5)}}
+          <image wx:for="{{list}}" wx:key="{{index}}" class="helpMe-people" src="{{item.avatarUrl}}" />
+        </view>
+      </view>
+      <view wx:if="{{showMore}}" class="helpMe-all">
+          <image wx:for="{{listAll}}" wx:key="{{index}}" class="helpMe-people" src="{{item.avatarUrl}}" />
+        
+      </view>
+      <view class="moreBtn" @tap="bindShowMore">
+        <image class="bg" src="/images/arrawBg.png" />
+        <view class="iconfont arraw {{showMore ? 'up': 'down'}}">&#xe620;</view>
+      </view>
+    </view>
+    <view class="main">
+      <image class="share-pic" src="/images/share.png" />
+      <view class="share-des">据说得到一人助力 公考成绩就可以加一分哦 我的成绩靠你了</view>
+    </view>
+    <view class="footer">
+      <button class="shareBtn" plain open-type"share">
+        <image class="bg" src="/images/shareBtn.png" />
+        <view class="iconfont">&#xe6e6;</view>
+        邀请好友助力        
+      </button>
+      <view class="shareBtn" @tap="bindShare">
+        <image class="bg" src="/images/shareBtn2.png" />        
+        <view class="iconfont">&#xe684;</view>
+        分享到朋友圈
+      </view>
+    </view>
+    <view class="mask" wx:if="{{showMask}}" @tap="hideMask">
+      <block wx:if="{{loading}}">
+        <view class="loading">50%</view>
+        <view class="text">正在生成海报...{{progress}}%</view>
+      </block>
+      <canvas canvas-id="share" hidden="{{loading}}" style="width:345px; height:455px"></canvas>
+      <!-- <image class="tempImg" src="{{tempFilePath}}" /> -->
+      <image @tap.stop="saveImg" class="save-btn" wx:if="{{!loading}}" src="/images/saveBtn.png" />
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class Home extends wepy.page {
+  config = {
+    navigationBarTitleText: '考神鴐衜',
+    navigationBarBackgroundColor: '#41e05f',
+    navigationBarTextStyle: 'white'
+  };
+  data = {
+    userInfo: null,
+    helpInfo: null, // 助力信息
+    showMask: false,
+    showMore: false,
+    progress: 0,
+    interval: null,
+    loading: true,
+    tempFilePath: '',
+    openid: wepy.getStorageSync('openid')
+  };
+  computed = {
+    list() {
+      return this.helpInfo ? this.helpInfo.helps.slice(0, 5) : [];
+    },
+    listAll() {
+      return this.helpInfo ? this.helpInfo.helps.slice(5) : [];
+    }
+  };
+  methods = {
+    bindShowMore() {
+      this.showMore = !this.showMore;
+    },
+    hideMask() {
+      if (this.tempFilePath) {
+        this.showMask = false;
+      }
+    },
+    async bindShare() {
+      this.showMask = true;
+      let tempFilePath = await this.generatePic.bind(this)(
+        this.$parent.globalData.baseUrl
+      );
+      console.log(tempFilePath);
+      await this.loadingFn();
+      this.tempFilePath = tempFilePath;
+      this.loading = false;
+      this.$apply();
+    }
+  };
+  // loading 加载效果
+  loadingFn() {
+    return new Promise(resolve => {
+      this.interval = setInterval(() => {
+        if (this.progress >= 100) {
+          this.progress = 100;
+          this.$apply();
+          clearInterval(this.interval);
+          resolve();
+        } else {
+          this.progress = this.progress + Math.ceil(Math.random() * 3);
+          this.$apply();
+        }
+      }, 50);
+    });
+  }
+  // 生成图片，返回Promise对象 包含图片临时路径
+  generatePic(baseUrl) {
+    return new Promise(async resolve => {
+      const ctx = wx.createCanvasContext('share');
+      let res = await wepy.request({
+        url: baseUrl + '/qr?openid=' + this.openid
+      });
+
+      let imgInfo = await wepy.getImageInfo({ src: res.data });
+      ctx.drawImage('/images/shareBg.png', 0, 0, 345, 455);
+      ctx.drawImage(imgInfo.path, 237 / 2, 507 / 2, 218 / 2, 218 / 2);
+      ctx.draw(true, () => {
+        wx.canvasToTempFilePath({
+          canvasId: 'share',
+          success: res => {
+            resolve(res.tempFilePath);
+          }
+        });
+      });
+    });
+  }
+  async saveImg() {
+    let res = await wepy.saveImageToPhotosAlbum({
+      filePath: this.tempFilePath
+    });
+    console.log(res);
+  }
+  async onLoad(options) {
+    // 没有符id返回index页
+    if (!wepy.getStorageSync('runeid')) {
+      wx.redirectTo({
+        url: '/pages/index'
+      });
+      return;
+    }
+    let app = this.$parent;
+    // await wepy.login();
+    let res = await wepy.getUserInfo();
+    this.userInfo = res.userInfo;
+
+    // 获取助力信息
+    let helpInfo = await wepy.request({
+      url: app.globalData.baseUrl + '/rune/' + wepy.getStorageSync('runeid')
+    });
+    this.helpInfo = helpInfo.data;
+    this.$apply();
+  }
+  onShareAppMessage(options) {
+    let runeid = wepy.getStorageSync('runeid');
+    return {
+      title: '考神鴐衜', //'pages/help'
+      path: `/pages/help?openid=${this.openid}&runeid=${runeid}`, //
+      success() {
+        console.log('ok');
+      }
+    };
+  }
+}
+</script>
+
+
