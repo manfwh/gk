@@ -1,0 +1,76 @@
+<template>
+    <view>
+        <image class="about-pic" src="/images/about.jpg" />
+        <view class="footer">
+            <view>咨询微信： {{wxCode1}} <text style="margin: 0 10rpx"></text> {{wxCode2}}</view>
+        </view>
+        <button wx:if="show" class="getPhone" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"> </button>
+    </view>
+</template>
+<style lang="less">
+page {
+  background: #fff;
+}
+.about-pic {
+  width: 100%;
+  height: 1134rpx;
+}
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+.footer view {
+  font-size: 28rpx;
+  color: #000;
+  text-align: center;
+  line-height: 80rpx;
+}
+.getPhone {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    opacity: 0;
+}
+</style>
+<script>
+    import wepy from 'wepy';
+    export default class About extends wepy.page {
+        config = {
+            navigationBarTitleText: '考神鴐衜',
+            navigationBarBackgroundColor: '#ffbf19',
+            navigationBarTextStyle: 'white'
+        };
+        data = {
+            wxCode1: 'symm33',
+            wxCode2: 'yxd3417',
+            show: true,
+        };
+        methods = {
+            async getPhoneNumber(e) {
+                this.show = false;
+                console.log(e.detail.errMsg);
+                console.log(e.detail.iv);
+                console.log(e.detail.encryptedData);
+                let res = await wepy.login();
+                let result = await wepy.request({
+                    url: this.globalData.baseUrl + '/getPhone',
+                    method: 'POST',
+                    data: {
+                        code: res.code,
+                        iv: e.detail.iv,
+                        encryptedData: e.detail.encryptedData
+                        
+                    }
+                });
+                this.$apply();
+            }
+        };
+    }
+</script>
+
+

@@ -17,7 +17,7 @@ export default class extends wepy.app {
     this.use('promisify');
   }
   config = {
-    pages: ['pages/index','pages/home', 'pages/help', ],
+    pages: ['pages/index', 'pages/about', 'pages/home', 'pages/help'],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
@@ -27,10 +27,14 @@ export default class extends wepy.app {
   };
   globalData = {
     userInfo: null,
-    baseUrl: 'http://192.168.31.249:3000'
+    baseUrl: 'https://xcx.sunpun.com'
   };
-  onLaunch() {
+  async onLaunch() {
     // 获取用户信息
+    console.log(22, wx.getStorageSync('openid'))
+    if(!wx.getStorageSync('openid')) {
+       await this.login();
+    }
     wx.getSetting({
       success: res => {
         if (res.authSetting['scope.userInfo']) {
@@ -51,18 +55,19 @@ export default class extends wepy.app {
       }
     });
   }
+
   // 登录获取openid
   async login() {
     let res = await wepy.login();
     let result = await wepy.request({
-          url: this.globalData.baseUrl + '/login',
-          method: 'POST',
-          data: {
-            code: res.code
-          }
-        });
-    wepy.setStorageSync('openid',result.data.openid)
-    return result;
+      url: this.globalData.baseUrl + '/login',
+      method: 'POST',
+      data: {
+        code: res.code
+      }
+    });
+    console.log(result)
+    wepy.setStorageSync('openid', result.data);
   }
 }
 </script>

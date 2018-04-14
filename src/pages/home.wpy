@@ -254,7 +254,7 @@
         </view>
         <view class="info">
           <view class="nickName">Hello! {{userInfo.nickName}}</view>
-          <view class="helpInfo" wx:if="{{helpInfo.helps.length}}">获得助力: {{helpInfo.helps.length}} 次        <text style="padding: 0 10rpx"></text>好友排行: 10名</view>
+          <view class="helpInfo" wx:if="{{helpInfo.helps.length}}">获得助力: {{helpInfo.helps.length}} 次        <text style="padding: 0 10rpx"></text>全省排行: {{rank}}名</view>
         </view>
         
       </view>
@@ -321,6 +321,7 @@ export default class Home extends wepy.page {
     interval: null,
     loading: true,
     tempFilePath: '',
+    rank: 0, //全省排名
     openid: wepy.getStorageSync('openid')
   };
   computed = {
@@ -356,9 +357,8 @@ export default class Home extends wepy.page {
   loadingFn() {
     return new Promise(resolve => {
       this.interval = setInterval(() => {
-        if (this.progress >= 100) {
+        if (this.progress > 100) {
           this.progress = 100;
-          this.$apply();
           clearInterval(this.interval);
           resolve();
         } else {
@@ -373,7 +373,7 @@ export default class Home extends wepy.page {
     return new Promise(async resolve => {
       const ctx = wx.createCanvasContext('share');
       let res = await wepy.request({
-        url: baseUrl + '/qr?openid=' + this.openid
+        url: baseUrl + '/qr?runeid=' + wepy.getStorageSync('runeid')
       });
 
       let imgInfo = await wepy.getImageInfo({ src: res.data });
@@ -393,6 +393,15 @@ export default class Home extends wepy.page {
     let res = await wepy.saveImageToPhotosAlbum({
       filePath: this.tempFilePath
     });
+    wx.showModal({
+      title: '成功保存图片',
+      content: '已成功为您保存图片到手机相册，请自行前往朋友圈分享',
+      showCancel: false,
+      confirmText: '知道了',
+      success: res =>{
+        console.log(res)
+      }
+    })
     console.log(res);
   }
   async onLoad(options) {
@@ -413,15 +422,16 @@ export default class Home extends wepy.page {
       url: app.globalData.baseUrl + '/rune/' + wepy.getStorageSync('runeid')
     });
     this.helpInfo = helpInfo.data;
+    this.rank = helpInfo.data.helps.length * Math.ceil(Math.random()*600) + 200
     this.$apply();
   }
   onShareAppMessage(options) {
     let runeid = wepy.getStorageSync('runeid');
     return {
-      title: '考神鴐衜', //'pages/help'
+      title: '我正在参加公务员考试，赶快来帮助我吧！', //'pages/help'
       path: `/pages/help?openid=${this.openid}&runeid=${runeid}`, //
+      imageUrl: '/images/help.jpg',
       success() {
-        console.log('ok');
       }
     };
   }

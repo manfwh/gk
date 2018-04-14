@@ -30,7 +30,7 @@ export default class Help extends wepy.page {
     helping: false,
     runeid: '', // 考神符id
     percentage: 0,
-    helpText: '立即为他助力',
+    helpText: '立即为助力',
     helpTextPic: 'helpText2',
     inserval: null,
     helpUser: '' //给谁助力
@@ -45,12 +45,19 @@ export default class Help extends wepy.page {
     // let openid = options.openid;
 
     this.runeid = options.runeid;
+    console.log(options);
     //获取url参数openid 获取助力的对象
     let result = await wepy.request({
-      url: app.globalData.baseUrl + '/rune/' + this.runeid,
+      url: app.globalData.baseUrl + '/rune/' + this.runeid
       // method: 'POST'
     });
+    console.log(result);
     this.helpUser = result.data.owner;
+    if (result.data.owner.gender == 2) {
+      this.helpText = '立即为她助力';
+    } else {
+      this.helpText = '立即为他助力';
+    }
     this.$apply();
 
     app.userInfoReadyCallback = res => {
@@ -66,12 +73,25 @@ export default class Help extends wepy.page {
   }
   methods = {
     async bingHelp() {
+      let helps = wx.getStorageSync('helps') || [];
+      if(this.helpText == '正在为他助力') return
       if (this.helpText == '俺也要领取考神符') {
         wx.redirectTo({
           url: '/pages/index'
         });
         return;
       }
+      if (helps.indexOf(this.runeid) > -1) {
+        wx.showToast({
+          icon: 'none',
+          title: '你已经助力过了~'
+        });
+        this.percentage = 100;
+        this.helpText = '俺也要领取考神符';
+        this.helpTextPic = 'helpText';
+        return;
+      }
+
       // let openid = wepy.getStorageSync('openid');
       // if (!openid) {
       //   openid = await this.$parent.login().openid;
@@ -91,6 +111,7 @@ export default class Help extends wepy.page {
       this.helping = true;
       this.helpText = '正在为他助力';
       this.interval = setInterval(() => {
+        this.percentage = this.percentage + Math.ceil(Math.random() * 2);
         if (this.percentage >= 100) {
           this.percentage = 100;
           clearInterval(this.interval);
@@ -98,11 +119,17 @@ export default class Help extends wepy.page {
           this.helpText = '俺也要领取考神符';
           this.helpTextPic = 'helpText';
           this.$apply();
-          return;
+          wx.showToast({
+            title: '助力已完成'
+          });
+
+          // 助力过的符id保存在本地，防止重复助力
+          helps.push(this.runeid);
+          wx.setStorageSync('helps', helps);
         }
-        this.percentage = this.percentage + Math.ceil(Math.random() * 4);
+        
         this.$apply();
-      }, 16);
+      }, 30);
     }
   };
 }
