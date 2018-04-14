@@ -233,6 +233,30 @@
   height: 960rpx;
   z-index: 100;
 }
+// 底部技术支持
+.support {
+  padding-bottom: 20rpx;
+  .logo-wrap {
+    width: 50rpx;
+    height: 50rpx;
+    background: #49dd81;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 32rpx auto 10rpx;
+    image {
+      width: 30rpx;
+      height: 30rpx;
+    }
+  }
+  .company-text {
+    font-size: 20rpx;
+    color: #ccc;
+    text-align: center;
+    text-shadow: 1rpx 1rpx #fff
+  }
+}
 @keyframes rotate {
   0% {
     transform: translate(-50%, 0) rotateZ(0deg);
@@ -291,6 +315,11 @@
         分享到朋友圈
       </view>
     </view>
+    <view class="support">
+      <view class="logo-wrap"><image src="/images/companyLogo.png" /></view>
+      <view class="company-text">山西一兜科技技术支持</view>
+      <view class="company-text">TEL: 186 3616 1167</view>
+    </view>
     <view class="mask" wx:if="{{showMask}}" @tap="hideMask">
       <block wx:if="{{loading}}">
         <view class="loading">50%</view>
@@ -308,7 +337,7 @@ import wepy from 'wepy';
 
 export default class Home extends wepy.page {
   config = {
-    navigationBarTitleText: '考神鴐衜',
+    navigationBarTitleText: '考神加分',
     navigationBarBackgroundColor: '#41e05f',
     navigationBarTextStyle: 'white'
   };
@@ -377,7 +406,7 @@ export default class Home extends wepy.page {
       });
 
       let imgInfo = await wepy.getImageInfo({ src: res.data });
-      ctx.drawImage('/images/shareBg.png', 0, 0, 345, 455);
+      ctx.drawImage('/images/shareSave.png', 0, 0, 345, 455);
       ctx.drawImage(imgInfo.path, 237 / 2, 507 / 2, 218 / 2, 218 / 2);
       ctx.draw(true, () => {
         wx.canvasToTempFilePath({
@@ -398,10 +427,10 @@ export default class Home extends wepy.page {
       content: '已成功为您保存图片到手机相册，请自行前往朋友圈分享',
       showCancel: false,
       confirmText: '知道了',
-      success: res =>{
-        console.log(res)
+      success: res => {
+        console.log(res);
       }
-    })
+    });
     console.log(res);
   }
   async onLoad(options) {
@@ -422,7 +451,8 @@ export default class Home extends wepy.page {
       url: app.globalData.baseUrl + '/rune/' + wepy.getStorageSync('runeid')
     });
     this.helpInfo = helpInfo.data;
-    this.rank = helpInfo.data.helps.length * Math.ceil(Math.random()*600) + 200
+    this.rank =
+      helpInfo.data.helps.length * Math.ceil(Math.random() * 600) + 200;
     this.$apply();
   }
   onShareAppMessage(options) {
@@ -431,8 +461,7 @@ export default class Home extends wepy.page {
       title: '我正在参加公务员考试，赶快来帮助我吧！', //'pages/help'
       path: `/pages/help?openid=${this.openid}&runeid=${runeid}`, //
       imageUrl: '/images/help.jpg',
-      success() {
-      }
+      success() {}
     };
   }
 }

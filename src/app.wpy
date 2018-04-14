@@ -31,7 +31,6 @@ export default class extends wepy.app {
   };
   async onLaunch() {
     // 获取用户信息
-    console.log(22, wx.getStorageSync('openid'))
     if(!wx.getStorageSync('openid')) {
        await this.login();
     }
@@ -66,7 +65,6 @@ export default class extends wepy.app {
         code: res.code
       }
     });
-    console.log(result)
     wepy.setStorageSync('openid', result.data);
   }
 }

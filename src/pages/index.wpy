@@ -71,7 +71,7 @@ import wepy from 'wepy';
 
 export default class Index extends wepy.page {
   config = {
-    navigationBarTitleText: '考神鴐衜',
+    navigationBarTitleText: '考神加分',
     navigationBarBackgroundColor: '#41e05f',
     navigationBarTextStyle: 'white'
   };
