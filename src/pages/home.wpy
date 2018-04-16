@@ -459,7 +459,7 @@ export default class Home extends wepy.page {
     let runeid = wepy.getStorageSync('runeid');
     return {
       title: '我正在参加公务员考试，赶快来帮助我吧！', //'pages/help'
-      path: `/pages/help?openid=${this.openid}&runeid=${runeid}`, //
+      path: `/pages/help?openid=${wepy.getStorageSync('openid')}&runeid=${runeid}`, //
       imageUrl: '/images/help.jpg',
       success() {}
     };

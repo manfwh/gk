@@ -58,7 +58,7 @@ page {
                 console.log(e.detail.encryptedData);
                 let res = await wepy.login();
                 let result = await wepy.request({
-                    url: this.globalData.baseUrl + '/getPhone',
+                    url: this.$parent.globalData.baseUrl + '/getPhone',
                     method: 'POST',
                     data: {
                         code: res.code,

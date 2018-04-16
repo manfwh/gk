@@ -43,8 +43,13 @@ export default class Help extends wepy.page {
   async onLoad(options) {
     let app = this.$parent;
     // let openid = options.openid;
-
-    this.runeid = options.runeid;
+    var scene = decodeURIComponent(options.scene)
+    if(scene) {
+      this.runeid = scene;
+    } else {
+      this.runeid = options.runeid;
+    }
+    
     console.log(options);
     //获取url参数openid 获取助力的对象
     let result = await wepy.request({
