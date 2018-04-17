@@ -375,7 +375,6 @@ export default class Home extends wepy.page {
       let tempFilePath = await this.generatePic.bind(this)(
         this.$parent.globalData.baseUrl
       );
-      console.log(tempFilePath);
       await this.loadingFn();
       this.tempFilePath = tempFilePath;
       this.loading = false;
@@ -428,10 +427,8 @@ export default class Home extends wepy.page {
       showCancel: false,
       confirmText: '知道了',
       success: res => {
-        console.log(res);
       }
     });
-    console.log(res);
   }
   async onLoad(options) {
     // 没有符id返回index页
@@ -452,7 +449,7 @@ export default class Home extends wepy.page {
     });
     this.helpInfo = helpInfo.data;
     this.rank =
-      helpInfo.data.helps.length * Math.ceil(Math.random() * 600) + 200;
+      helpInfo.data.helps.length + Math.ceil(Math.random() * 600) + 200;
     this.$apply();
   }
   onShareAppMessage(options) {

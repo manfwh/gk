@@ -47,6 +47,30 @@
   opacity: 0;
   z-index: 200;
 }
+// 底部技术支持
+.support {
+  margin-bottom: 20rpx;
+  .logo-wrap {
+    width: 50rpx;
+    height: 50rpx;
+    background: #49dd81;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 32rpx auto 10rpx;
+    image {
+      width: 30rpx;
+      height: 30rpx;
+    }
+  }
+  .company-text {
+    font-size: 20rpx;
+    color: #ccc;
+    text-align: center;
+    text-shadow: 1rpx 1rpx #fff
+  }
+}
 </style>
 <template>
   <view class="container">
@@ -62,7 +86,11 @@
       <image class="index-btn-pic" src="/images/index-btn.png" />
       <view class="index-btn-text">点击领取考神符</view>
     </view>
-    
+    <view class="support">
+      <view class="logo-wrap"><image src="/images/companyLogo.png" /></view>
+      <view class="company-text">山西一兜科技技术支持</view>
+      <view class="company-text">TEL: 186 3616 1167</view>
+    </view>
   </view>
 </template>
 

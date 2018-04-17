@@ -42,10 +42,9 @@ export default class Help extends wepy.page {
   };
   async onLoad(options) {
     let app = this.$parent;
-    // let openid = options.openid;
-    var scene = decodeURIComponent(options.scene)
-    if(scene) {
-      this.runeid = scene;
+    console.log(45, options)
+    if(options.scene) {
+      this.runeid = options.scene;
     } else {
       this.runeid = options.runeid;
     }

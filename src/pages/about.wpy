@@ -1,10 +1,21 @@
 <template>
     <view>
-        <image class="about-pic" src="/images/about.jpg" />
-        <view class="footer">
-            <view>咨询微信： {{wxCode1}} <text style="margin: 0 10rpx"></text> {{wxCode2}}</view>
+        <image class="about-pic {{show ? 'blur': ''}}" src="/images/about.jpg" />
+        <view class="footer"  wx:if="{{!show}}">
+            <view>咨询微信： {{wechat[0]}} <text style="margin: 0 10rpx"></text> {{wechat[1]}}</view>
         </view>
-        <button wx:if="show" class="getPhone" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"> </button>
+        <view class="call" @tap="makeCall"></view>
+        <view class="dailog-container" wx:if="{{show}}">
+            <view class="dialog-mask"></view>
+            <view class="dialog">
+                <view class="dialog-title">公考加分</view>
+                <view class="dialog-content">开启你的公务员考试通关之旅</view>
+                <view class="dialog-footer">
+                     <button class="getPhone" 
+                     open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" plain>一键授权</button>
+                </view>
+            </view>
+        </view>
     </view>
 </template>
 <style lang="less">
@@ -14,6 +25,19 @@ page {
 .about-pic {
   width: 100%;
   height: 1134rpx;
+}
+.about-pic.blur {
+  -webkit-filter: blur(5px);
+  filter: blur(5px);
+}
+.call {
+  width: 144rpx;
+  height: 144rpx;
+  position: absolute;
+  top: 970rpx;
+  opacity: 0;
+  left: 280rpx;
+  z-index: 100;
 }
 .footer {
   position: fixed;
@@ -27,50 +51,106 @@ page {
   text-align: center;
   line-height: 80rpx;
 }
-.getPhone {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    opacity: 0;
+.dialog-mask {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+.dialog {
+  position: fixed;
+  z-index: 5000;
+  width: 80%;
+  max-width: 600rpx;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  text-align: center;
+  border-radius: 3px;
+  overflow: hidden;
+  .dialog-title {
+    font-size: 18px;
+    padding: 15px 15px 5px;
+  }
+  .dialog-content {
+    padding: 15px 15px 5px;
+    min-height: 40px;
+    font-size: 16px;
+    line-height: 1.3;
+    word-wrap: break-word;
+    word-break: break-all;
+    color: #999;
+  }
+  .dialog-footer {
+    display: flex;
+    align-items: center;
+    position: relative;
+    line-height: 45px;
+    font-size: 17px;
+  }
+}
+button.getPhone {
+  width: 100%;
+  border: none;
+  border-top: 1px solid #ccc;
+  border-radius: 0;
 }
 </style>
 <script>
-    import wepy from 'wepy';
-    export default class About extends wepy.page {
-        config = {
-            navigationBarTitleText: '考神加分',
-            navigationBarBackgroundColor: '#ffbf19',
-            navigationBarTextStyle: 'white'
-        };
-        data = {
-            wxCode1: 'symm33',
-            wxCode2: 'yxd3417',
-            show: true,
-        };
-        methods = {
-            async getPhoneNumber(e) {
-                this.show = false;
-                console.log(e.detail.errMsg);
-                console.log(e.detail.iv);
-                console.log(e.detail.encryptedData);
-                let res = await wepy.login();
-                let result = await wepy.request({
-                    url: this.$parent.globalData.baseUrl + '/getPhone',
-                    method: 'POST',
-                    data: {
-                        code: res.code,
-                        iv: e.detail.iv,
-                        encryptedData: e.detail.encryptedData
-                        
-                    }
-                });
-                this.$apply();
-            }
-        };
+import wepy from 'wepy';
+export default class About extends wepy.page {
+  config = {
+    navigationBarTitleText: '考神加分',
+    navigationBarBackgroundColor: '#ffbf19',
+    navigationBarTextStyle: 'white'
+  };
+  data = {
+    wechat: null,
+    tel: null,
+    show: true
+  };
+  methods = {
+    async getPhoneNumber(e) {
+      let res = await wepy.login();
+      let result = await wepy.request({
+        url: this.$parent.globalData.baseUrl + '/getPhone',
+        method: 'POST',
+        data: {
+          code: res.code,
+          iv: e.detail.iv,
+          encryptedData: e.detail.encryptedData
+        }
+      });
+      if (result.statusCode == 204) {
+        wx.setStorageSync('phone', true);
+        this.show = false;
+      }
+      console.log(result);
+      this.$apply();
+    },
+    async makeCall() {
+      wx.makePhoneCall({
+        phoneNumber: String(this.tel)
+      })
     }
+  };
+  onLoad() {
+    if (wx.getStorageSync('phone')) {
+      this.show = false;
+    }
+    wepy.request(`${this.$parent.globalData.baseUrl}/getContact`)
+      .then(res =>{
+        console.log(res)
+        this.tel = res.data.tel;
+        this.wechat = res.data.wechat;
+        this.$apply()
+      })
+  }
+}
 </script>
 
 

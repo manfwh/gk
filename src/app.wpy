@@ -17,7 +17,7 @@ export default class extends wepy.app {
     this.use('promisify');
   }
   config = {
-    pages: ['pages/index', 'pages/about', 'pages/home', 'pages/help'],
+    pages: ['pages/index','pages/about',  'pages/home', 'pages/help'],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
