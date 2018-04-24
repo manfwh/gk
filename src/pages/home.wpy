@@ -1,8 +1,9 @@
 <style lang="less">
 @color: #c94ee4;
 .text-style {
-  font-size: 26rpx;
-  color: #a5a5a5;
+  font-size: 24rpx;
+  color: #444;
+  font-weight: bold;
 }
 .bg-pic {
   width: 100%;
@@ -18,7 +19,7 @@
   border-radius: 15px;
   margin-top: 25rpx;
   box-sizing: border-box;
-  padding: 24rpx;
+  padding: 24rpx 4rpx 24rpx 20rpx;
   background: #fff;
   transition: all 0.5s;
   position: absolute;
@@ -32,7 +33,7 @@
       height: 110rpx;
       border-radius: 50%;
       border: 2rpx solid @color;
-      margin-right: 24rpx;
+      margin-right: 12rpx;
       .avatar-pic {
         width: 100%;
         height: 100%;
@@ -49,6 +50,11 @@
     .helpInfo {
       .text-style;
       margin-top: 6rpx;
+    }
+    .strong {
+      color: red;
+      padding: 0 5rpx;
+      font-size: 32rpx;
     }
   }
   .noHelp {
@@ -254,7 +260,7 @@
     font-size: 20rpx;
     color: #ccc;
     text-align: center;
-    text-shadow: 1rpx 1rpx #fff
+    text-shadow: 1rpx 1rpx #fff;
   }
 }
 @keyframes rotate {
@@ -268,6 +274,78 @@
     transform: translate(-50%, 0%) rotateZ(360deg);
   }
 }
+.modal {
+}
+.mask2 {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  opacity: 0;  
+  z-index: -1;
+  transition: all 0.5s;
+}
+.user-info {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+  z-index: 10001;
+  width: 355rpx;
+  height: 150rpx;
+  background: #fff;
+  border-radius: 5px;
+  padding: 20rpx;
+  text-align: center;
+  transform: scale(0);
+  image {
+    width: 100rpx;
+    height: 100rpx;
+    border-radius: 50%;
+  }
+  .name {
+    text-align: center;
+    font-size: 28rpx;
+    line-height: 60rpx;
+    color: #444;
+  }
+}
+.active {
+  opacity: 0.4;  
+  z-index: 1000;
+}
+.scaleIn {
+  animation: scaleIn 0.3s ease-in forwards;
+}
+.scaleOut {
+  animation: scaleOut 0.3s ease-in forwards;
+}
+@keyframes scaleIn {
+  0% {
+    transform: scale(0)
+  }
+  80% {
+    transform: scale(1.2)
+  }
+  100% {
+    transform: scale(1)
+  }
+}
+@keyframes scaleOut {
+  0% {
+    transform: scale(1)
+  }
+  20% {
+    transform: scale(1.2)
+  }
+  100% {
+    transform: scale(0)
+  }
+}
 </style>
 <template>
   <view class="container">    
@@ -278,20 +356,28 @@
         </view>
         <view class="info">
           <view class="nickName">Hello! {{userInfo.nickName}}</view>
-          <view class="helpInfo" wx:if="{{helpInfo.helps.length}}">获得助力: {{helpInfo.helps.length}} 次        <text style="padding: 0 10rpx"></text>全省排行: {{rank}}名</view>
+          <view class="helpInfo" wx:if="{{helpInfo.helps.length}}">
+            <wxs module='fixed'>
+              var fn =  function (num){
+                return Number(num).toFixed(1)
+              }
+              module.exports.fntofixde = fn
+            </wxs>
+            已有<text class="strong">{{helpInfo.helps.length}}</text>位好友为你助力，考神保佑得分<text class="strong">{{fixed.fntofixde(helpInfo.owner.score)}}</text>分
+          </view>
         </view>
         
       </view>
-      <image wx:if="{{!helpInfo.helps.length}}" class="noHelp" src="/images/noHelp.png" />
+      <!-- <image wx:if="{{!helpInfo.helps.length}}" class="noHelp" src="/images/noHelp.png" /> -->
       <view wx:if="{{helpInfo.helps.length}}" class="helpMe-wrap">
         <view class="helpMe-text">为我助力好友:</view>
          <view class="helpMe-list">
            {{helpInfo.helps.slice(0, 5)}}
-          <image wx:for="{{list}}" wx:key="{{index}}" class="helpMe-people" src="{{item.avatarUrl}}" />
+          <image @tap="showDetail({{item.avatarUrl}}, {{item.nickName}})" wx:for="{{list}}" wx:key="{{index}}" class="helpMe-people" src="{{item.avatarUrl}}" />
         </view>
       </view>
       <view wx:if="{{showMore}}" class="helpMe-all">
-          <image wx:for="{{listAll}}" wx:key="{{index}}" class="helpMe-people" src="{{item.avatarUrl}}" />
+          <image @tap="showDetail({{item.avatarUrl}}, {{item.nickName}})" wx:for="{{listAll}}" wx:key="{{index}}" class="helpMe-people" src="{{item.avatarUrl}}" />
         
       </view>
       <view class="moreBtn" @tap="bindShowMore">
@@ -325,9 +411,16 @@
         <view class="loading">50%</view>
         <view class="text">正在生成海报...{{progress}}%</view>
       </block>
-      <canvas canvas-id="share" hidden="{{loading}}" style="width:345px; height:455px"></canvas>
-      <!-- <image class="tempImg" src="{{tempFilePath}}" /> -->
+      <canvas canvas-id="share" hidden="{{loading}}" style="width:{{windowWidth}}px; height:{{windowHeight}}px"></canvas>
+      <!-- <image wx:if="{{tempFilePath}}" class="" src="{{}}" /> -->
       <image @tap.stop="saveImg" class="save-btn" wx:if="{{!loading}}" src="/images/saveBtn.png" />
+    </view>
+    <view class="modal">
+      <view class="mask2 {{showModal ? 'active': ''}}" @tap="hideDetail"></view>
+      <view class="user-info {{showModal ? 'scaleIn' : 'scaleOut'}}">
+        <image src="{{avatarUrl}}" />
+        <view class="name">{{nickName}}</view>
+      </view>
     </view>
   </view>
 </template>
@@ -350,8 +443,13 @@ export default class Home extends wepy.page {
     interval: null,
     loading: true,
     tempFilePath: '',
-    rank: 0, //全省排名
-    openid: wepy.getStorageSync('openid')
+    openid: null,
+    showModal: false,
+    avatarUrl: '',
+    nickName: '',
+    pixelRatio: 1,
+    windowWidth: 0,
+    windowHeight: 0
   };
   computed = {
     list() {
@@ -370,6 +468,16 @@ export default class Home extends wepy.page {
         this.showMask = false;
       }
     },
+    showDetail(url, name) {
+      this.showModal = true
+      this.avatarUrl = url;
+      this.nickName = name;
+      // this.animationData = animation.export();
+      
+    },
+    hideDetail() {
+      this.showModal = false;
+    },
     async bindShare() {
       this.showMask = true;
       let tempFilePath = await this.generatePic.bind(this)(
@@ -385,7 +493,7 @@ export default class Home extends wepy.page {
   loadingFn() {
     return new Promise(resolve => {
       this.interval = setInterval(() => {
-        if (this.progress > 100) {
+        if (this.progress > 96) {
           this.progress = 100;
           clearInterval(this.interval);
           resolve();
@@ -405,12 +513,51 @@ export default class Home extends wepy.page {
       });
 
       let imgInfo = await wepy.getImageInfo({ src: res.data });
-      ctx.drawImage('/images/shareSave.png', 0, 0, 345, 455);
-      ctx.drawImage(imgInfo.path, 237 / 2, 507 / 2, 218 / 2, 218 / 2);
-      ctx.draw(true, () => {
+      let pixelRatio = this.pixelRatio;
+        let w = this.windowWidth;
+        let h = this.windowHeight;
+      let big = true;
+      let bigWH = [w * 0.32,h * 0.465]
+      let smallWH = [w * 0.3,h * 0.5]
+      let WH = bigWH
+      let iphone = false   //调整小平手机
+      console.log(pixelRatio)
+      console.log(WH)
+      wx.getSystemInfo({
+        success:res =>{
+          if(res.windowHeight <= 504){
+            WH = smallWH
+            iphone = true;
+          }
+        }
+      })
+      console.log(WH)
+      ctx.setFontSize(20)
+      ctx.setTextAlign('center')
+      ctx.setFillStyle('white')
+      if(iphone){
+        ctx.drawImage('/images/423iphone.png', 0, 0, 690,1000,0,0,w,h-10);
+      }else{
+        ctx.drawImage('/images/423.png', 0, 0, 690,1000,0,0,w,h-10);
+        // ctx.fillText(this.userInfo.nickName, w * 0.5, h * 0.48 )
+      }
+      let qrW = (80/(w*2*0.92)) * 2;
+      ctx.drawImage(imgInfo.path, WH[0], WH[1], 80, 80);//二维码
+      // let img = await wepy.getImageInfo({src: this.userInfo.avatarUrl })
+      // console.log(img)
+      // ctx.drawImage(img.path, w * 0.45, h * 0.36, 30, 30);
+
+
+      ctx.draw(false, () => {
         wx.canvasToTempFilePath({
+          // height:this.windowHeight,
+          // destWidth:this.windowWidth,
+          // destHeight:this.windowHeight,
+          // quality:1,
+          height:700,
           canvasId: 'share',
           success: res => {
+            console.log(res,'------------')
             resolve(res.tempFilePath);
           }
         });
@@ -426,8 +573,7 @@ export default class Home extends wepy.page {
       content: '已成功为您保存图片到手机相册，请自行前往朋友圈分享',
       showCancel: false,
       confirmText: '知道了',
-      success: res => {
-      }
+      success: res => {}
     });
   }
   async onLoad(options) {
@@ -438,6 +584,16 @@ export default class Home extends wepy.page {
       });
       return;
     }
+    wx.getSystemInfo({
+      success: res =>{
+        console.log(res)
+      
+        this.pixelRatio = res.pixelRatio ;
+        this.windowWidth = res.windowWidth/1.08 ;
+        this.windowHeight = res.windowHeight/1.4;
+        this.$apply()
+      }
+    })
     let app = this.$parent;
     // await wepy.login();
     let res = await wepy.getUserInfo();
@@ -448,15 +604,21 @@ export default class Home extends wepy.page {
       url: app.globalData.baseUrl + '/rune/' + wepy.getStorageSync('runeid')
     });
     this.helpInfo = helpInfo.data;
-    this.rank =
-      helpInfo.data.helps.length + Math.ceil(Math.random() * 600) + 200;
+    // 预计得分数 120-155 之间
+    // 110
+    // let score = wx.setStorageSync('score', )
+    
+    // this.score = (helpInfo.data.helps.length * Math.random() + 110).toFixed(1);
+
     this.$apply();
   }
   onShareAppMessage(options) {
     let runeid = wepy.getStorageSync('runeid');
     return {
-      title: '我正在参加公务员考试，赶快来帮助我吧！', //'pages/help'
-      path: `/pages/help?openid=${wepy.getStorageSync('openid')}&runeid=${runeid}`, //
+      title: '领取考神符加持神力，邀请好友来为我助力吧！保佑考过！', //'pages/help'
+      path: `/pages/help?openid=${wepy.getStorageSync(
+        'openid'
+      )}&runeid=${runeid}`, //
       imageUrl: '/images/help.jpg',
       success() {}
     };

@@ -17,7 +17,7 @@ export default class extends wepy.app {
     this.use('promisify');
   }
   config = {
-    pages: ['pages/index','pages/about',  'pages/home', 'pages/help'],
+    pages: ['pages/index','pages/about','pages/help','pages/home'  ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
@@ -27,7 +27,7 @@ export default class extends wepy.app {
   };
   globalData = {
     userInfo: null,
-    baseUrl: 'https://xcx.sunpun.com'
+    baseUrl: 'https://xcx.ccss331.com'
   };
   async onLaunch() {
     // 获取用户信息

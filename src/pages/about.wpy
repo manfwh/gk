@@ -125,14 +125,14 @@ export default class About extends wepy.page {
           encryptedData: e.detail.encryptedData
         }
       });
+      console.log(result)
       if (result.statusCode == 204) {
         wx.setStorageSync('phone', true);
         this.show = false;
       }
-      console.log(result);
       this.$apply();
     },
-    async makeCall() {
+    async makeCall() {np
       wx.makePhoneCall({
         phoneNumber: String(this.tel)
       })

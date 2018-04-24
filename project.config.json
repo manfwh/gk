@@ -8,8 +8,8 @@
 		"newFeature": true
 	},
 	"compileType": "miniprogram",
-	"appid": "wxb0ce7dd74bfa7015",
-	"projectname": "%E5%85%AC%E8%80%83%E5%8A%A0%E5%88%86",
+	"appid": "wx4b382d8e8b140fa1",
+	"projectname": "%E5%8A%A0%E5%88%86",
 	"miniprogramRoot": "./dist",
 	"condition": {
 		"search": {
@@ -41,7 +41,7 @@
 					"id": 1,
 					"name": "转发",
 					"pathName": "pages/help",
-					"query": "runeid=5acf072a9dca1619b813aa0b",
+					"query": "scene=5ad40e5c4e6f6512b874ef53",
 					"scene": "1007"
 				}
 			]

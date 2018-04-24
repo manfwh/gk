@@ -24,7 +24,7 @@
   }
 }
 .btn-wrap {
-  margin-top: 54rpx;
+  margin-top: 48rpx;
   height: 124rpx;
   position: relative;
   .index-btn-pic {
@@ -68,8 +68,14 @@
     font-size: 20rpx;
     color: #ccc;
     text-align: center;
-    text-shadow: 1rpx 1rpx #fff
+    text-shadow: 1rpx 1rpx #fff;
   }
+}
+.tipText {
+  text-align: center;
+  color: #666;
+  font-size: 26rpx;
+  margin-top: 10rpx;
 }
 </style>
 <template>
@@ -78,6 +84,8 @@
       <image class="rune-pic" src="/images/rune.jpg"/>
       <view class="target">{{userInfo.nickName}}</view>
     </view>
+    <view class="tipText">截屏保存考神符，保佑公考上岸</view>
+    
     <view class="btn-wrap"  @tap="getRune" >
       <form bindsubmit="submit" wx:if="{{showForm}}" report-submit>
         <text name="{{openid}}"></text>
@@ -110,7 +118,7 @@ export default class Index extends wepy.page {
   };
   methods = {
     async submit(e) {
-      console.log(e.detail.formId);
+      console.log(e.detail.formId,'-------------');
       wepy
         .request({
           url: this.$parent.globalData.baseUrl + '/formid',
@@ -130,6 +138,13 @@ export default class Index extends wepy.page {
       wx.showLoading({
         title: '领取中...'
       });
+      if (wepy.getStorageSync('runeid')) {
+        wx.navigateTo({
+          url: '/pages/home'
+        });
+        wx.hideLoading();
+        return
+      }
       try {
         let result = await wepy.request({
           url: app.globalData.baseUrl + '/rune',
@@ -163,12 +178,12 @@ export default class Index extends wepy.page {
     }
   };
   async onLoad() {
-    // 有没有 符id，有的话跳到home页
-    if (wepy.getStorageSync('runeid')) {
-      wx.redirectTo({
-        url: '/pages/home'
-      });
-    }
+    // // 有没有 符id，有的话跳到home页
+    // if (wepy.getStorageSync('runeid')) {
+    //   wx.redirectTo({
+    //     url: '/pages/home'
+    //   });
+    // }
     if (this.$parent.globalData.userInfo) {
       this.userInfo = this.$parent.globalData.userInfo;
     } else {
