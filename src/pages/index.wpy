@@ -92,7 +92,7 @@
         <button class="form-btn" formType="submit"></button>
       </form>
       <image class="index-btn-pic" src="/images/index-btn.png" />
-      <view class="index-btn-text">点击领取考神符</view>
+      <view class="index-btn-text">{{btnText}}</view>
     </view>
     <view class="support">
       <view class="logo-wrap"><image src="/images/companyLogo.png" /></view>
@@ -114,7 +114,8 @@ export default class Index extends wepy.page {
   data = {
     userInfo: null,
     showForm: true,
-    openid: wx.getStorageSync('openid')
+    openid: wx.getStorageSync('openid'),
+    btnText: '点击领取考神符'
   };
   methods = {
     async submit(e) {
@@ -135,9 +136,7 @@ export default class Index extends wepy.page {
     },
     async getRune() {
       let app = this.$parent;
-      wx.showLoading({
-        title: '领取中...'
-      });
+      
       if (wepy.getStorageSync('runeid')) {
         wx.navigateTo({
           url: '/pages/home'
@@ -145,6 +144,9 @@ export default class Index extends wepy.page {
         wx.hideLoading();
         return
       }
+      wx.showLoading({
+        title: '领取中...'
+      });
       try {
         let result = await wepy.request({
           url: app.globalData.baseUrl + '/rune',
@@ -157,15 +159,24 @@ export default class Index extends wepy.page {
         console.log(result);
         if (result.data.code == 20000) {
           wx.hideLoading();
-          wx.showToast({
-            title: '领取成功'
-          });
+          wx.showModal({
+            title: '成功领取考神符',
+            content: '查看为我助力好友！',
+            showCancel: false,
+            confirmText: '立即前往', 
+            success({confirm}) {
+              console.log(confirm)
+              if(confirm) {
+                wx.redirectTo({
+                  url: '/pages/home'
+                });
+              }
+            }
+          })
           // 把考神符id保存到本地，跳转到个人页面
           wepy.setStorageSync('runeid', result.data.data.rune._id);
           wepy.setStorageSync('userid', result.data.data.user._id);
-          wx.redirectTo({
-            url: '/pages/home'
-          });
+          
         } else if (result.data.code == 30001) {
           wepy.setStorageSync('runeid', result.data.data.rune._id);
           wx.redirectTo({
@@ -178,12 +189,9 @@ export default class Index extends wepy.page {
     }
   };
   async onLoad() {
-    // // 有没有 符id，有的话跳到home页
-    // if (wepy.getStorageSync('runeid')) {
-    //   wx.redirectTo({
-    //     url: '/pages/home'
-    //   });
-    // }
+    if (wepy.getStorageSync('runeid')) {
+      this.btnText = '查看为我助力的好友'
+    }
     if (this.$parent.globalData.userInfo) {
       this.userInfo = this.$parent.globalData.userInfo;
     } else {

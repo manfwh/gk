@@ -184,7 +184,7 @@
     width: 354rpx;
     height: 100rpx;
     display: block;
-    margin-top: 45rpx;
+    flex-shrink: 0;
   }
   .text {
     font-size: 28rpx;
@@ -411,7 +411,7 @@
         <view class="loading">50%</view>
         <view class="text">正在生成海报...{{progress}}%</view>
       </block>
-      <canvas canvas-id="share" hidden="{{loading}}" style="width:{{windowWidth}}px; height:{{windowHeight}}px"></canvas>
+      <canvas canvas-id="share" hidden="{{loading}}" style="width:{{windowWidth}}px; height:{{windowHeight*2}}px"></canvas>
       <!-- <image wx:if="{{tempFilePath}}" class="" src="{{}}" /> -->
       <image @tap.stop="saveImg" class="save-btn" wx:if="{{!loading}}" src="/images/saveBtn.png" />
     </view>
@@ -511,8 +511,14 @@ export default class Home extends wepy.page {
       let res = await wepy.request({
         url: baseUrl + '/qr?runeid=' + wepy.getStorageSync('runeid')
       });
-
-      let imgInfo = await wepy.getImageInfo({ src: res.data });
+      let imgInfo = null;
+      console.log(514, res)
+      try {
+        imgInfo = await wepy.getImageInfo({ src: 'https://xcx.ccss331.com/images/5ad542b89f97e211a4a09a78.png' });
+      } catch (error) {
+        console.log(519, error)
+      }
+      console.log(516, imgInfo)
       let pixelRatio = this.pixelRatio;
         let w = this.windowWidth;
         let h = this.windowHeight;
@@ -532,17 +538,25 @@ export default class Home extends wepy.page {
         }
       })
       console.log(WH)
-      ctx.setFontSize(20)
+      ctx.setFontSize(16)
       ctx.setTextAlign('center')
       ctx.setFillStyle('white')
-      if(iphone){
-        ctx.drawImage('/images/423iphone.png', 0, 0, 690,1000,0,0,w,h-10);
-      }else{
-        ctx.drawImage('/images/423.png', 0, 0, 690,1000,0,0,w,h-10);
-        // ctx.fillText(this.userInfo.nickName, w * 0.5, h * 0.48 )
-      }
-      let qrW = (80/(w*2*0.92)) * 2;
-      ctx.drawImage(imgInfo.path, WH[0], WH[1], 80, 80);//二维码
+      // if(iphone){
+      //   ctx.drawImage('/images/423.png', 0, 0, w,h,0,0,w,h-10);
+      // }else{
+      //   ctx.drawImage('/images/423.png', 0, 0, w,h,0,0,w,h-10);
+      //   // ctx.fillText(this.userInfo.nickName, w * 0.5, h * 0.48 )
+      // }
+      ctx.drawImage('/images/423.png', 0, 0, w, h);
+      let qrW = (120/345)*w
+      console.log(w)
+      console.log(qrW)
+      ctx.drawImage(imgInfo.path, (w-qrW)/2, WH[1], qrW, qrW);//二维码   //Number(num).toFixed(1)
+      ctx.fillText(`考神保佑已有${this.helpInfo.helps.length}位好友为我助力`, w * 0.5, h * 0.40)  
+      ctx.fillText(`公考成绩${Number(this.helpInfo.owner.score).toFixed(1)}分，赶快来帮助我吧！`, w * 0.5, h * 0.40 + 20)  
+      ctx.setFontSize(12)  
+      ctx.fillText('全日制督学 山西青创黄埔公考基地 微信：sym338', w * 0.5, h * 0.98)
+      ctx.fillText('长按识别图中二维码为我公考的加分！', w * 0.5, h * 0.84)
       // let img = await wepy.getImageInfo({src: this.userInfo.avatarUrl })
       // console.log(img)
       // ctx.drawImage(img.path, w * 0.45, h * 0.36, 30, 30);
@@ -550,11 +564,6 @@ export default class Home extends wepy.page {
 
       ctx.draw(false, () => {
         wx.canvasToTempFilePath({
-          // height:this.windowHeight,
-          // destWidth:this.windowWidth,
-          // destHeight:this.windowHeight,
-          // quality:1,
-          height:700,
           canvasId: 'share',
           success: res => {
             console.log(res,'------------')
@@ -589,13 +598,12 @@ export default class Home extends wepy.page {
         console.log(res)
       
         this.pixelRatio = res.pixelRatio ;
-        this.windowWidth = res.windowWidth/1.08 ;
-        this.windowHeight = res.windowHeight/1.4;
+        this.windowWidth = res.windowWidth*0.92 ;
+        this.windowHeight = res.windowHeight*0.83;
         this.$apply()
       }
     })
     let app = this.$parent;
-    // await wepy.login();
     let res = await wepy.getUserInfo();
     this.userInfo = res.userInfo;
 
@@ -604,12 +612,6 @@ export default class Home extends wepy.page {
       url: app.globalData.baseUrl + '/rune/' + wepy.getStorageSync('runeid')
     });
     this.helpInfo = helpInfo.data;
-    // 预计得分数 120-155 之间
-    // 110
-    // let score = wx.setStorageSync('score', )
-    
-    // this.score = (helpInfo.data.helps.length * Math.random() + 110).toFixed(1);
-
     this.$apply();
   }
   onShareAppMessage(options) {
