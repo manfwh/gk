@@ -11,10 +11,10 @@
     <image class="move {{helping ? 'rotate': ''}}" style="left: {{offsetLeft}}rpx" src="/images/p.png" />
   </view>
   <view class="percentage">{{percentage}}%</view>
-  <view class="help-btn" @tap="bingHelp">
+  <button lang="zH-CN" open-type="getUserInfo" bindgetuserinfo="bingHelp" class="help-btn">
     <image src="/images/helpBtn.png" />
     {{helpText}}
-  </view>
+  </button>
 </template>
 <script>
 import wepy from 'wepy';
@@ -73,7 +73,17 @@ export default class Help extends wepy.page {
     }
   }
   methods = {
-    async bingHelp() {
+    async bingHelp(e) {
+       if (e.detail.errMsg == 'getUserInfo:ok') {
+        let res = await wepy.request({
+          url: this.$parent.globalData.baseUrl + '/userinfo',
+          data: {
+            openid: wepy.getStorageSync('openid'),
+            userinfo: e.detail.userInfo
+          },
+          method: 'post'
+        });
+      }
       let helps = wx.getStorageSync('helps') || [];
       if(this.helpText == '正在为他助力') return;
       if(this.helpText == '俺也要领取考神符') {
@@ -215,6 +225,7 @@ page {
   width: 690rpx;
   height: 124rpx;
   position: relative;
+  background: none;
   font-size: 50rpx;
   color: #fff;
   text-align: center;

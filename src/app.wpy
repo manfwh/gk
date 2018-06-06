@@ -11,13 +11,15 @@
 <script>
 import wepy from 'wepy';
 import 'wepy-async-function';
+import Promise from 'promise-polyfill';
 export default class extends wepy.app {
   constructor() {
     super();
+    this.use('requestfix');
     this.use('promisify');
   }
   config = {
-    pages: ['pages/index','pages/about','pages/help','pages/home'  ],
+    pages: ['pages/index', 'pages/about', 'pages/help', 'pages/home'],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
@@ -27,12 +29,19 @@ export default class extends wepy.app {
   };
   globalData = {
     userInfo: null,
-    baseUrl: 'https://xcx.ccss331.com'
+    baseUrl: 'https://xcx.ccss331.com/gkjf'
   };
   async onLaunch() {
+    if(wx.getStorageSync('clear')) {
+
+    } else {
+      wx.clearStorageSync();
+      wx.setStorageSync('clear', true)
+    }
+    
     // 获取用户信息
-    if(!wx.getStorageSync('openid')) {
-       await this.login();
+    if (!wx.getStorageSync('openid')) {
+      await this.login();
     }
     wx.getSetting({
       success: res => {
@@ -54,7 +63,7 @@ export default class extends wepy.app {
       }
     });
   }
-
+ 
   // 登录获取openid
   async login() {
     let res = await wepy.login();

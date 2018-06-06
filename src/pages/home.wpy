@@ -38,6 +38,7 @@
         width: 100%;
         height: 100%;
         border-radius: 50%;
+        overflow: hidden;
       }
     }
     .info {
@@ -152,6 +153,7 @@
   .shareBtn {
     width: 334rpx;
     height: 106rpx;
+    background: none;
     position: relative;
     display: flex;
     align-items: center;
@@ -159,6 +161,9 @@
     color: #fff;
     font-size: 30rpx;
     border: none;
+    &::after {
+      border: none;
+    }
     .bg {
       .bg-pic;
     }
@@ -206,7 +211,6 @@
       rgb(76, 231, 51) 0%,
       rgb(62, 230, 121) 100%
     );
-
     overflow: hidden;
     &:before,
     &:after {
@@ -283,7 +287,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  opacity: 0;  
+  opacity: 0;
   z-index: -1;
   transition: all 0.5s;
 }
@@ -315,7 +319,7 @@
   }
 }
 .active {
-  opacity: 0.4;  
+  opacity: 0.4;
   z-index: 1000;
 }
 .scaleIn {
@@ -326,24 +330,24 @@
 }
 @keyframes scaleIn {
   0% {
-    transform: scale(0)
+    transform: scale(0);
   }
   80% {
-    transform: scale(1.2)
+    transform: scale(1.2);
   }
   100% {
-    transform: scale(1)
+    transform: scale(1);
   }
 }
 @keyframes scaleOut {
   0% {
-    transform: scale(1)
+    transform: scale(1);
   }
   20% {
-    transform: scale(1.2)
+    transform: scale(1.2);
   }
   100% {
-    transform: scale(0)
+    transform: scale(0);
   }
 }
 </style>
@@ -352,18 +356,22 @@
     <view class="header">
       <view class="userInfo">
         <view class="avatar">
-          <image class="avatar-pic" src="{{userInfo.avatarUrl}}" />
+          <view class="avatar-pic"><open-data type="userAvatarUrl"></open-data></view>
+          <!-- <image  src="{{userInfo.avatarUrl}}" /> -->
         </view>
         <view class="info">
-          <view class="nickName">Hello! {{userInfo.nickName}}</view>
-          <view class="helpInfo" wx:if="{{helpInfo.helps.length}}">
+          <view class="nickName">Hello! <open-data type="userNickName"></open-data></view>
+          <view class="helpInfo" wx:if="{{helpInfo.helps.length>0}}">
             <wxs module='fixed'>
               var fn =  function (num){
                 return Number(num).toFixed(1)
               }
               module.exports.fntofixde = fn
             </wxs>
-            已有<text class="strong">{{helpInfo.helps.length}}</text>位好友为你助力，考神保佑得分<text class="strong">{{fixed.fntofixde(helpInfo.owner.score)}}</text>分
+            已有<text class="strong">{{helpInfo.helps.length}}</text>位好友为你助力，考神保佑得分<text class="strong">{{fixed.fntofixde(helpInfo.owner.score) || 110 }}</text>分
+          </view>
+          <view class="helpInfo" wx:else>
+            已有<text class="strong">0</text>位好友为你助力，考神保佑得分<text class="strong">{{fixed.fntofixde(helpInfo.owner.score) ? fixed.fntofixde(helpInfo.owner.score) : 114.5}}</text>分
           </view>
         </view>
         
@@ -390,16 +398,16 @@
       <view class="share-des">据说得到一人助力 公考成绩就可以加一分哦 我的成绩靠你了</view>
     </view>
     <view class="footer">
-      <button class="shareBtn" plain open-type"share">
+      <button class="shareBtn" plain open-type="share">
         <image class="bg" src="/images/shareBtn.png" />
         <view class="iconfont">&#xe6e6;</view>
         邀请好友助力        
       </button>
-      <view class="shareBtn" @tap="bindShare">
+      <button lang="zH-CN" open-type="getUserInfo" bindgetuserinfo="bindShare" class="shareBtn">
         <image class="bg" src="/images/shareBtn2.png" />        
         <view class="iconfont">&#xe684;</view>
-        分享到朋友圈
-      </view>
+        晒晒考神成绩
+      </button>
     </view>
     <view class="support">
       <view class="logo-wrap"><image src="/images/companyLogo.png" /></view>
@@ -469,20 +477,32 @@ export default class Home extends wepy.page {
       }
     },
     showDetail(url, name) {
-      this.showModal = true
+      this.showModal = true;
       this.avatarUrl = url;
       this.nickName = name;
       // this.animationData = animation.export();
-      
     },
     hideDetail() {
       this.showModal = false;
     },
-    async bindShare() {
+    async bindShare(e) {
       this.showMask = true;
+      // const scope = await wepy.getSetting();
+      if (e.detail.errMsg == 'getUserInfo:ok') {
+        let res = await wepy.request({
+          url: this.$parent.globalData.baseUrl + '/userinfo',
+          data: {
+            openid: wepy.getStorageSync('openid'),
+            userinfo: e.detail.userInfo
+          },
+          method: 'post'
+        });
+      }
+
       let tempFilePath = await this.generatePic.bind(this)(
         this.$parent.globalData.baseUrl
       );
+
       await this.loadingFn();
       this.tempFilePath = tempFilePath;
       this.loading = false;
@@ -512,35 +532,28 @@ export default class Home extends wepy.page {
         url: baseUrl + '/qr?runeid=' + wepy.getStorageSync('runeid')
       });
       let imgInfo = null;
-      console.log(514, res)
       try {
-        imgInfo = await wepy.getImageInfo({ src: 'https://xcx.ccss331.com/images/5ad542b89f97e211a4a09a78.png' });
-      } catch (error) {
-        console.log(519, error)
-      }
-      console.log(516, imgInfo)
+        imgInfo = await wepy.getImageInfo({ src: res.data });
+      } catch (error) {}
       let pixelRatio = this.pixelRatio;
-        let w = this.windowWidth;
-        let h = this.windowHeight;
+      let w = this.windowWidth;
+      let h = this.windowHeight;
       let big = true;
-      let bigWH = [w * 0.32,h * 0.465]
-      let smallWH = [w * 0.3,h * 0.5]
-      let WH = bigWH
-      let iphone = false   //调整小平手机
-      console.log(pixelRatio)
-      console.log(WH)
+      let bigWH = [w * 0.32, h * 0.465];
+      let smallWH = [w * 0.3, h * 0.5];
+      let WH = bigWH;
+      let iphone = false; //调整小平手机
       wx.getSystemInfo({
-        success:res =>{
-          if(res.windowHeight <= 504){
-            WH = smallWH
+        success: res => {
+          if (res.windowHeight <= 504) {
+            WH = smallWH;
             iphone = true;
           }
         }
-      })
-      console.log(WH)
-      ctx.setFontSize(16)
-      ctx.setTextAlign('center')
-      ctx.setFillStyle('white')
+      });
+      ctx.setFontSize(16);
+      ctx.setTextAlign('center');
+      ctx.setFillStyle('white');
       // if(iphone){
       //   ctx.drawImage('/images/423.png', 0, 0, w,h,0,0,w,h-10);
       // }else{
@@ -548,25 +561,35 @@ export default class Home extends wepy.page {
       //   // ctx.fillText(this.userInfo.nickName, w * 0.5, h * 0.48 )
       // }
       ctx.drawImage('/images/423.png', 0, 0, w, h);
-      let qrW = (120/345)*w
-      console.log(w)
-      console.log(qrW)
-      ctx.drawImage(imgInfo.path, (w-qrW)/2, WH[1], qrW, qrW);//二维码   //Number(num).toFixed(1)
-      ctx.fillText(`考神保佑已有${this.helpInfo.helps.length}位好友为我助力`, w * 0.5, h * 0.40)  
-      ctx.fillText(`公考成绩${Number(this.helpInfo.owner.score).toFixed(1)}分，赶快来帮助我吧！`, w * 0.5, h * 0.40 + 20)  
-      ctx.setFontSize(12)  
-      ctx.fillText('全日制督学 山西青创黄埔公考基地 微信：sym338', w * 0.5, h * 0.98)
-      ctx.fillText('长按识别图中二维码为我公考的加分！', w * 0.5, h * 0.84)
+      let qrW = 120 / 345 * w;
+      ctx.drawImage(imgInfo.path, (w - qrW) / 2, WH[1], qrW, qrW); //二维码   //Number(num).toFixed(1)
+      ctx.fillText(
+        `考神保佑已有${this.helpInfo.helps.length}位好友为我助力`,
+        w * 0.5,
+        h * 0.4
+      );
+      ctx.fillText(
+        `公考成绩${Number(this.helpInfo.owner.score).toFixed(
+          1
+        )}分，赶快来帮助我吧！`,
+        w * 0.5,
+        h * 0.4 + 20
+      );
+      ctx.setFontSize(12);
+      ctx.fillText(
+        '全日制督学 山西青创黄埔公考基地 微信：symm338',
+        w * 0.5,
+        h * 0.98
+      );
+      ctx.fillText('长按识别图中二维码为我公考的加分！', w * 0.5, h * 0.84);
       // let img = await wepy.getImageInfo({src: this.userInfo.avatarUrl })
       // console.log(img)
       // ctx.drawImage(img.path, w * 0.45, h * 0.36, 30, 30);
-
 
       ctx.draw(false, () => {
         wx.canvasToTempFilePath({
           canvasId: 'share',
           success: res => {
-            console.log(res,'------------')
             resolve(res.tempFilePath);
           }
         });
@@ -579,7 +602,7 @@ export default class Home extends wepy.page {
     });
     wx.showModal({
       title: '成功保存图片',
-      content: '已成功为您保存图片到手机相册，请自行前往朋友圈分享',
+      content: '已成功为您保存图片到手机相册',
       showCancel: false,
       confirmText: '知道了',
       success: res => {}
@@ -594,23 +617,26 @@ export default class Home extends wepy.page {
       return;
     }
     wx.getSystemInfo({
-      success: res =>{
-        console.log(res)
-      
-        this.pixelRatio = res.pixelRatio ;
-        this.windowWidth = res.windowWidth*0.92 ;
-        this.windowHeight = res.windowHeight*0.83;
-        this.$apply()
+      success: res => {
+        this.pixelRatio = res.pixelRatio;
+        this.windowWidth = res.windowWidth * 0.92;
+        this.windowHeight = res.windowHeight * 0.83;
+        this.$apply();
       }
-    })
+    });
     let app = this.$parent;
-    let res = await wepy.getUserInfo();
-    this.userInfo = res.userInfo;
+    try {
+      let res = await wepy.getUserInfo();
+      this.userInfo = res.userInfo;
+    } catch (error) {
+      console.log(error);
+    }
 
     // 获取助力信息
     let helpInfo = await wepy.request({
       url: app.globalData.baseUrl + '/rune/' + wepy.getStorageSync('runeid')
     });
+    
     this.helpInfo = helpInfo.data;
     this.$apply();
   }

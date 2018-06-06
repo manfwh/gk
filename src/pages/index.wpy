@@ -119,7 +119,6 @@ export default class Index extends wepy.page {
   };
   methods = {
     async submit(e) {
-      console.log(e.detail.formId,'-------------');
       wepy
         .request({
           url: this.$parent.globalData.baseUrl + '/formid',
@@ -195,9 +194,9 @@ export default class Index extends wepy.page {
     if (this.$parent.globalData.userInfo) {
       this.userInfo = this.$parent.globalData.userInfo;
     } else {
-      let res = await wepy.getUserInfo();
-      this.userInfo = res.userInfo;
-      this.$apply();
+      // let res = await wepy.getUserInfo();
+      // this.userInfo = res.userInfo;
+      // this.$apply();
     }
   }
 }
